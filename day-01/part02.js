@@ -16,10 +16,6 @@ for (let i = 0; i < inputArray.length; i++) {
   console.log(inputArray[i])
   numbersArray.map((number) => {
 
-    // let regex = new RegExp(number.word, 'g');
-
-    // let inputString = 'vggvnhqkjseventwo4onetwonftrnd';
-    // let substringToFind = number.word;
     
     let startIndex = 0;
 
@@ -42,22 +38,11 @@ for (let i = 0; i < inputArray.length; i++) {
       }
     }
 
-    // console.log(matches)
-    // if (inputArray[i].includes(number.word)) {
-    //   let index = inputArray[i].indexOf(number.word);
-    //   numArray.push({ index, number: number.number })
-    // }
-
-    // if (inputArray[i].includes(number.number)) {
-    //   let index = inputArray[i].indexOf(number.number);
-    //   numArray.push({ index, number: number.number })
-    // }
-
   })
 
   //sorting array with index
   matches.sort((a, b) => a.index - b.index);
-  // console.log(numArray)
+  
   console.log(matches)
   let number = 0
   if (matches.length === 1) {
