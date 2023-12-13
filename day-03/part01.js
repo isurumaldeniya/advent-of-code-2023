@@ -1,105 +1,79 @@
+import { dir } from 'console';
 import fs from 'fs';
 
 const inputArray = fs.readFileSync('./input.txt', 'utf-8').trim().split('\n');
 
-const directionsOfStartDigit = [
-  [0, 1], [0, -1], [-1, -1], [-1, 0], [-1, 1]
+const directions = [
+  [-1, 0], [-1, -1], [0, -1],[1, -1], [1, 0], [1, 1], [0, 1],  [-1, 1], 
 ]
 
-const directionsOfEndDigit = [
-  [1, -1], [1, 0], [1, 1], [0, 1], [0, -1]
-]
+let sum = 0;
+let rowLength = inputArray.length;
+let colLength = inputArray[0].length;
+let numbers = [];
 
-const directionsOfMiddleDigits = [
-  [0, 1], [0, -1]
-]
 
-function checkDot(entry) {
-  if (entry == '.') {
-    return true
-  } return false
-}
+function checkDirForDigit(row, col, dirArray) {
+  for (let point = 0; point < dirArray.length; point++) {
+    let [pointX, pointY] = dirArray[point];
 
-function checkDirStartDigit(y, x, dirArray) {
-  for (let m = 0; m < dirArray.length; m++) {
-    let [pointX, pointY] = dirArray[m]
-    let currY = y + pointY;
-    let currX = x + pointX;
-    // console.log(dirArray[m])
-    if ((currY >= 0 && currY < inputArray.length) && (currX >= 0 && currX < inputArray[0].length)) {
-      if (!Number(inputArray[currY][currX])) {
-        // console.log(inputArray[currY][currX])
-        if (!checkDot(inputArray[currY][currX])) {
-          return true
-        }
+    let currRow = row + pointY;
+    let currCol = col + pointX;
+
+    //check if the current point is out of the array
+    if ((currRow >= 0 && currRow < rowLength) && (currCol >= 0 && currCol < colLength)) {
+
+      //check current point is not a number and not a '.'
+      if (isNaN(Number(inputArray[currRow][currCol])) && inputArray[currRow][currCol] != '.') {
+        return true
       }
     }
   }
   return false
 }
 
-let sum = 0;
 
-for (let i = 0; i < inputArray.length; i++) {
+
+for (let row = 0; row < rowLength; row++) {
   let number = '';
+  for (let col = 0; col < colLength; col++) {
+    let check = false;
+    let entry = inputArray[row][col];
 
-  for (let j = 0; j < inputArray[i].length; j++) {
-    let entry = inputArray[i][j]
-    console.log(j)
-    if ((Number(entry) || Number(entry) == 0)) {
-      number = number + entry
-      // console.log(number)
-      // console.log(!inputArray[i][j+1])
-    } if ((!Number(entry) || !inputArray[i][j + 1]) && Number(entry) != 0) {
-      //get the adjust digits to combine and make the whole number
-      if (Number(number)) {
-        console.log(number)
+    if (isNaN(entry)) {
+      //if not number go to the next entry
+      continue
+    }
+    number += entry;
 
-        for (let l = 0; l < number.length; l++) {
-          console.log('number:------' + number[l])
-          let y = i;
-          j = j == inputArray.length - 1 ? j + 1 : j;
-          let x = l + j - number.length ;
-          console.log(y, x)
 
-          if (number.length == 1) {
-            if (checkDirStartDigit(y, x, directionsOfStartDigit) || checkDirStartDigit(y, x, directionsOfEndDigit) || checkDirStartDigit(y, x, directionsOfMiddleDigits)) {
-              // console.log(number)
-              fs.appendFileSync('./output.txt', number + '\n')
-              sum = sum + Number(number)
-            }
-          } else {
-            if (l == 0) {
-              if (checkDirStartDigit(y, x, directionsOfStartDigit)) {
-                // console.log(number)
-                fs.appendFileSync('./output.txt', number + '\n')
-                sum = sum + Number(number)
-                break
-              }
-            }
-            else if (l == number.length - 1) {
-              if (checkDirStartDigit(y, x, directionsOfEndDigit)) {
-                // console.log(number)
-                fs.appendFileSync('./output.txt', number + '\n')
-                sum = sum + Number(number)
-                break
-              }
-            }
-            else {
-              if (checkDirStartDigit(y, x, directionsOfMiddleDigits)) {
-                // console.log(number)+
-                fs.appendFileSync('./output.txt', number + '\n')
-                sum = sum + Number(number)
-                break
-              }
-            }
-          }
-        }
+    //when number found append all the numbers next to that number
+    while (++col < colLength) {
+      
+      //check the directions around the number and update the check status
+      if (!check) {
+        //decrease col by 1 to make sure stay in the correct position
+        check = checkDirForDigit(row, col-1, directions)
       }
-      //reset the number
-      number = ''
+      if (Number.isInteger(parseInt(inputArray[row][col]))) {
+        number += inputArray[row][col]
+      } else {
+
+        //when next entry is not a number break the for loop and check for next number
+        break
+      }
     }
 
+    if (check) {
+      check  = false;
+      //adding numbers to the numbers array
+      numbers.push(Number(number))
+    }
+    //reset the number for the row
+    check = false;
+    number = ''
   }
+
+
 }
-console.log(sum)
+console.log(numbers.reduce((a,c) => a + c, 0))
