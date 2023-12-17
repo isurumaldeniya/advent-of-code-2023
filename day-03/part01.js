@@ -1,4 +1,3 @@
-import { dir } from 'console';
 import fs from 'fs';
 
 const inputArray = fs.readFileSync('./input.txt', 'utf-8').trim().split('\n');
